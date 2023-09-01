@@ -62,22 +62,6 @@ async function conversor(monto,monedaDifDePesos){
     return valorConvertido.toFixed(2)
 }
 
-/*function addData(chart, label, newData) {
-    chart.data.labels.push(label);
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(newData);
-    });
-    chart.update();
-}
-
-function removeData(chart) {
-    chart.data.labels.pop();
-    chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
-    chart.update();
-}*/
-
 // ---- FUNCION PARA CREAR LAS PROPIEDADES DEL GRÁFICO ----
 async function crearGrafico(moneda){
     const monedaData = await getApi(`https://mindicador.cl/api/${moneda}`)
@@ -116,7 +100,7 @@ async function crearGrafico(moneda){
 // ---- FUNCION PARA RENDERIZAR EL GRÁFICO ----
 async function renderGrafico(moneda){
     const config = await crearGrafico(moneda)
-    nuevoGrafico = new Chart(grafico, config)
+    let nuevoGrafico = new Chart(grafico, config)
     return nuevoGrafico
 }
 

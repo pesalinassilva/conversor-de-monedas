@@ -6,14 +6,15 @@ let btnConvertir = document.querySelector("#buscar")
 let contenedorGrafico = document.querySelector('.grafico')
 let grafico = document.querySelector("#myChart")
 
-// ---- FUNCION PARA ACCEDER A API ----
+// ---- FUNCION PARA ACCEDER A API CON UN MENSAJE DE ERROR EN CASO QUE NO CARGUE LA API ----
 async function getApi(url){
     try {
         const res = await fetch(url)
         const data = await res.json()
         return data
     }catch(e){
-        alert(e.message)
+        //alert('Ups! hubo un problema inesperado :c ' + e.message)
+        resultado.innerHTML = `Ups! hubo un problema inesperado :c ${e.message}`
     }
 }
 
@@ -62,7 +63,8 @@ async function conversor(monto,monedaDifDePesos){
     return valorConvertido.toFixed(2)
 }
 
-// ---- FUNCION PARA CREAR LAS PROPIEDADES DEL GRÁFICO ----
+// ---- FUNCION PARA CREAR LAS PROPIEDADES DEL GRÁFICO Y RENDERIZAR----
+let nuevoGrafico
 async function crearGrafico(moneda){
     const monedaData = await getApi(`https://mindicador.cl/api/${moneda}`)
     contador = 0
@@ -74,6 +76,7 @@ async function crearGrafico(moneda){
             return []
         }
     })
+
     let labels = fechaValor.map((fecha) => {
         return fecha.fecha
     })
@@ -81,6 +84,11 @@ async function crearGrafico(moneda){
     let data = fechaValor.map((valor) => {
         return valor.valor
     })
+
+    if (nuevoGrafico) {
+        nuevoGrafico.destroy();
+    }
+
     const config = {
         type: 'line',
         data:{
@@ -94,13 +102,7 @@ async function crearGrafico(moneda){
             ]
         }
     }
-    return config
-}
-
-// ---- FUNCION PARA RENDERIZAR EL GRÁFICO ----
-async function renderGrafico(moneda){
-    const config = await crearGrafico(moneda)
-    let nuevoGrafico = new Chart(grafico, config)
+    nuevoGrafico = new Chart(grafico, config)
     return nuevoGrafico
 }
 
@@ -112,11 +114,11 @@ async function convertirMoneda(){
         if (tipoMoneda.value == moneda.nombre){
             if (moneda.unidad_medida !== 'Dólar'){
                 resultado.innerHTML = `Resultado: ${montoValor} CLP son ${(montoValor/moneda.valor).toFixed(2)} ${(moneda.codigo).toUpperCase()}`
-                renderGrafico(moneda.codigo)
+                crearGrafico(moneda.codigo)
             }else if(moneda.unidad_medida == 'Dólar'){
                 let monedaConvertida = await conversor(montoValor,moneda.codigo)
                 resultado.innerHTML = `Resultado: ${montoValor} CLP son ${monedaConvertida} ${(moneda.codigo).toUpperCase()}`
-                renderGrafico(moneda.codigo)
+                crearGrafico(moneda.codigo)
             }
         }
     })
@@ -126,13 +128,13 @@ async function convertirMoneda(){
 btnConvertir.addEventListener('click', async () => {
     let montoInput = monto.value
     let tipoMonedaInput = tipoMoneda.value
-    console.log(tipoMoneda.value)
     if (montoInput != ''){
         contenedorGrafico.style.display = 'flex'
         convertirMoneda()
     }else if(montoInput == '' || tipoMonedaInput == ''){
         alert('Ingrese monto y seleccione moneda')
     }
+    
 })
 
 

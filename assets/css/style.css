@@ -45,6 +45,14 @@ hr{
     font-weight: bold;
 }
 
+#buscar:hover{
+    background-color: rgb(84, 145, 165);
+}
+
+#buscar:active{
+    background-color: rgb(158, 165, 84);
+}
+
 .grafico{
     display: none;
     justify-content: center;
